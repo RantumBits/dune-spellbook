@@ -17,42 +17,41 @@
 -- Test Query here: https://dune.com/queries/1855986
 
 WITH zeroex_tx AS (
-        SELECT 
-            tr.tx_hash,
-            tr.block_number,
-            MAX('0x' || CASE
-                                WHEN POSITION('869584cd' IN INPUT) <> 0
-                                THEN SUBSTRING(INPUT
-                                        FROM (position('869584cd' IN INPUT) + 32)
-                                        FOR 40)
-                                WHEN POSITION('fbc019a7' IN INPUT) <> 0
-                                THEN SUBSTRING(INPUT
-                                        FROM (position('fbc019a7' IN INPUT) + 32)
-                                        FOR 40)
-                            END) AS affiliate_address
+    SELECT distinct 
+             tr.tx_hash,
+                       max(CASE
+                            WHEN bytearray_position(INPUT, 0x869584cd ) <> 0 THEN SUBSTRING(INPUT
+                                                                                   FROM (bytearray_position(INPUT, 0x869584cd) + 16)
+                                                                                   FOR 20)
+                            WHEN bytearray_position(INPUT, 0xfbc019a7) <> 0 THEN SUBSTRING(INPUT
+                                                                                   FROM (bytearray_position(INPUT, 0xfbc019a7 ) + 16)
+                                                                                   FOR 20)
+                        END) AS affiliate_address,
+            tr.block_number as block_number,
+            tr.block_time as block_time
         FROM {{ source('arbitrum', 'traces') }} tr
         WHERE tr.to IN (
                 -- exchange contract
-                '0x61935cbdd02287b511119ddb11aeb42f1593b7ef', 
+                0x61935cbdd02287b511119ddb11aeb42f1593b7ef,
                 -- forwarder addresses
-                '0x6958f5e95332d93d21af0d7b9ca85b8212fee0a5',
-                '0x4aa817c6f383c8e8ae77301d18ce48efb16fd2be',
-                '0x4ef40d1bf0983899892946830abf99eca2dbc5ce', 
+                0x6958f5e95332d93d21af0d7b9ca85b8212fee0a5,
+                0x4aa817c6f383c8e8ae77301d18ce48efb16fd2be,
+                0x4ef40d1bf0983899892946830abf99eca2dbc5ce,
                 -- exchange proxy
-                '0xdef1c0ded9bec7f1a1670819833240f027b25eff'
+                0xdef1c0ded9bec7f1a1670819833240f027b25eff
                 )
                 AND (
-                        POSITION('869584cd' IN INPUT) <> 0
-                        OR POSITION('fbc019a7' IN INPUT) <> 0
-                    )
+                    bytearray_position(INPUT, 0x869584cd ) <> 0
+                    OR bytearray_position(INPUT, 0xfbc019a7 ) <> 0
+                )
                 
                 {% if is_incremental() %}
-                AND tr.block_time >= date_trunc('day', now() - interval '1 week') 
+                AND block_time >= date_trunc('day', now() - interval '7' day) 
                 {% endif %}
                 {% if not is_incremental() %}
-                AND tr.block_time >= '{{zeroex_v3_start_date}}'
+                AND block_time >= cast('{{zeroex_v3_start_date}}' as date)
                 {% endif %}
-        GROUP BY tr.tx_hash, tr.block_number
+            group by tr.tx_hash, tr.block_number, tr.block_time
 ),
 
 v4_rfq_fills_no_bridge AS (

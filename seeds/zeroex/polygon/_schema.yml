@@ -27,8 +27,7 @@ seeds:
         matcha_limit_order_flag: boolean
         volume_usd: double
         tx_from: varbinary
-        tx_to: varbinary
-        
+        tx_to: varbinarygit
   - name: zeroex_polygon_api_fills_deduped_sample
     config:
       tags: dunesql
@@ -59,5 +58,3 @@ seeds:
         tx_from: varbinary
         tx_to: varbinary
         fills_within: numeric 
-
-        

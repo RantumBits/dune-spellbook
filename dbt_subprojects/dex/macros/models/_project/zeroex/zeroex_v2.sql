@@ -222,7 +222,7 @@ taker_logs as (
              varbinary_position(st.data, (logs.data)) <> 0 
             or varbinary_position(st.data, ( cast(-1 * varbinary_to_int256(varbinary_substring(logs.data, varbinary_length(logs.data) - 31, 32)) AS VARBINARY))) <> 0 
           )
-          
+      
     where logs.block_time > TIMESTAMP '2024-07-15' 
         and cow_rn is null 
         AND (
@@ -301,7 +301,6 @@ maker_logs as (
                         )   
                     )
             )
-        
             or (
                 topic0 in (0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65)
                 and bytearray_substring(logs.topic1,13,20) in (tx_from, settler_address) 

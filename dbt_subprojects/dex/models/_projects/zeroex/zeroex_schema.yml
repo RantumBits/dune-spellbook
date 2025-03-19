@@ -158,7 +158,7 @@ models:
 
   - name: zeroex_trades
     meta:
-      blockchain: ethereum, optimism, polygon, arbitrum, fantom, avalanche, bnb, base, linea, scroll, blast, worldchain, mantle, berachain
+      blockchain: ethereum, optimism, polygon, arbitrum, fantom, avalanche, bnb, base, linea, scroll, blast, worldchain, mantle, berachain, ink
       project: zeroex
       contributors: rantum, danning.sui, bakabhai993 
     config:

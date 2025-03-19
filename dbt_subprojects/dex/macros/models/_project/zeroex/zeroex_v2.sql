@@ -200,7 +200,7 @@ maker_logs as (
                         (
                             (
                             (bytearray_substring(logs.topic1,13,20) in (st.contract_address, settler_address)  
-                        and (bytearray_substring(logs.topic2,13,20) in (bytearray_substring(st.topic2,13,20), tx_from, taker, settler_address, logs.contract_address))
+                        and (bytearray_substring(logs.topic2,13,20) in (bytearray_substring(st.topic2,13,20), tx_from, taker, settler_address, logs.contract_address, 0x0000000000000000000000000000000000000000))
                         )
                         or (bytearray_substring(logs.topic2,13,20) = taker and taker = tx_to ) 
                         or (bytearray_substring(logs.topic2,13,20) = st.contract_address 
@@ -211,13 +211,7 @@ maker_logs as (
                     )
                     and (varbinary_position(st.data, varbinary_ltrim(logs.data)) <> 0 
                     or varbinary_position(st.data, ( cast(-1 * varbinary_to_int256(varbinary_substring(logs.data, varbinary_length(logs.data) - 31, 32)) AS VARBINARY))) <> 0 
-<<<<<<< HEAD
                     or POSITION(CAST(varbinary_to_uint256(varbinary_ltrim(logs.data)) AS VARCHAR) IN CAST(amount_out_ AS VARCHAR)) > 0
-
-=======
-                    or varbinary_to_uint256(logs.data) in (amount_out_) 
-                    or POSITION(CAST(varbinary_to_uint256(logs.data) AS VARCHAR) IN CAST(amount_out_ AS VARCHAR)) > 0
->>>>>>> a22f1b527dad54f239973365d17e901e921fb568
                     ) 
                 
                         )  
@@ -351,7 +345,7 @@ select  block_time,
         settler_address as contract_address 
     from maker_logs
     join zeroex_tx st using (block_time, block_number, tx_hash, rn, settler_address) 
-    left join {{ source( 'evms', 'contracts') }} c on c.address = st.taker and c.blockchain = blockchain
+    left join {{ source( '{{blockchain}}', 'contracts') }} c on c.address = st.taker
     union 
     select * from cow_trades 
 )

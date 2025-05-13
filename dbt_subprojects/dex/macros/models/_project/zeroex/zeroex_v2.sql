@@ -68,7 +68,8 @@ swap_signatures as (
         (0x40e9cecb9f5f1f1c5b9c97dec2917b7ee92e57ba5563708daca94dd84ad7112f),
         (0xa07a543ab8a018198e99ca0184c93fe9050a79400a0a723441f84de1d972cc17),
         (0x0e8e403c2d36126272b08c75823e988381d9dc47f2f0a9a080d95f891d95c469),
-        (0x73adcdbf2d8fee0c1221daefef436a92c3c640e97ff2941e744bf5eef1ab346f)
+        (0x73adcdbf2d8fee0c1221daefef436a92c3c640e97ff2941e744bf5eef1ab346f),
+        (0xbaec78ca3218aba6fc32d82b79acdd1a47663d7b8da46e0c00947206d08f2071)
     ) AS t(signature)
 ),
 
@@ -245,7 +246,7 @@ maker_logs as (
                         or (bytearray_substring(logs.topic2,13,20) = taker and taker = tx_to ) 
                         or (bytearray_substring(logs.topic2,13,20) = st.contract_address 
                             and bytearray_substring(logs.topic1,13,20) = tx_to 
-                            and bytearray_substring(logs.topic1,13,20) not in (bytearray_substring(st.topic1,13,20), tx_to ) 
+                            and bytearray_substring(logs.topic2,13,20) not in (bytearray_substring(st.topic1,13,20), tx_to ) 
                         )
                         
                     )
